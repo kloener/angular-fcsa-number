@@ -1,4 +1,3 @@
-/*! angular-fcsa-number (version 1.5.3) 2014-10-17 */
 (function() {
   var fcsaNumberModule,
     __hasProp = {}.hasOwnProperty;
@@ -32,13 +31,19 @@
       isNotControlKey = function(which) {
         return controlKeys.indexOf(which) === -1;
       };
-      hasMultipleDecimals = function(val) {
-        return (val != null) && val.toString().split('.').length > 2;
+      hasMultipleDecimals = function(val, decimalSeparator) {
+        if (decimalSeparator == null) {
+          decimalSeparator = '.';
+        }
+        return (val != null) && val.toString().split(decimalSeparator).length > 2;
       };
-      makeMaxDecimals = function(maxDecimals) {
+      makeMaxDecimals = function(maxDecimals, decimalSeparator) {
         var regexString, validRegex;
+        if (decimalSeparator == null) {
+          decimalSeparator = '.';
+        }
         if (maxDecimals > 0) {
-          regexString = "^-?\\d*\\.?\\d{0," + maxDecimals + "}$";
+          regexString = "^-?\\d*\\" + decimalSeparator + "?\\d{0," + maxDecimals + "}$";
         } else {
           regexString = "^-?\\d*$";
         }
@@ -57,9 +62,12 @@
           return number >= minNumber;
         };
       };
-      makeMaxDigits = function(maxDigits) {
+      makeMaxDigits = function(maxDigits, decimalSeparator) {
         var validRegex;
-        validRegex = new RegExp("^-?\\d{0," + maxDigits + "}(\\.\\d*)?$");
+        if (decimalSeparator == null) {
+          decimalSeparator = '.';
+        }
+        validRegex = new RegExp("^-?\\d{0," + maxDigits + "}(\\" + decimalSeparator + "\\d*)?$");
         return function(val) {
           return validRegex.test(val);
         };
@@ -68,7 +76,7 @@
         var validations;
         validations = [];
         if (options.maxDecimals != null) {
-          validations.push(makeMaxDecimals(options.maxDecimals));
+          validations.push(makeMaxDecimals(options.maxDecimals, options.decimalSeparator));
         }
         if (options.max != null) {
           validations.push(makeMaxNumber(options.max));
@@ -77,14 +85,14 @@
           validations.push(makeMinNumber(options.min));
         }
         if (options.maxDigits != null) {
-          validations.push(makeMaxDigits(options.maxDigits));
+          validations.push(makeMaxDigits(options.maxDigits, options.decimalSeparator));
         }
         return function(val) {
           var i, number, _i, _ref;
           if (!isNumber(val)) {
             return false;
           }
-          if (hasMultipleDecimals(val)) {
+          if (hasMultipleDecimals(val, options.decimalSeparator)) {
             return false;
           }
           number = Number(val);
@@ -96,11 +104,19 @@
           return true;
         };
       };
-      addCommasToInteger = function(val) {
-        var commas, decimals, wholeNumbers;
-        decimals = val.indexOf('.') == -1 ? '' : val.replace(/^-?\d+(?=\.)/, '');
-        wholeNumbers = val.replace(/(\.\d+)$/, '');
-        commas = wholeNumbers.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+      addCommasToInteger = function(val, thousandSeparator, decimalSeparator) {
+        var commas, decimalRegex, decimals, wholeNumbers, wholeNumbersRegEx;
+        if (thousandSeparator == null) {
+          thousandSeparator = ',';
+        }
+        if (decimalSeparator == null) {
+          decimalSeparator = '.';
+        }
+        decimalRegex = new RegExp("^-?\\d+(?=\\" + decimalSeparator + ".)", "");
+        decimals = val.indexOf(decimalSeparator) == -1 ? '' : val.replace(decimalRegex, '');
+        wholeNumbersRegEx = new RegExp("(\\" + decimalSeparator + "\\d+)$");
+        wholeNumbers = val.replace(wholeNumbersRegEx, '');
+        commas = wholeNumbers.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + thousandSeparator);
         return "" + commas + decimals;
       };
       return {
@@ -110,12 +126,13 @@
           options: '@fcsaNumber'
         },
         link: function(scope, elem, attrs, ngModelCtrl) {
-          var isValid, options;
+          var isValid, options, thousandSepRegEx;
           options = getOptions(scope);
           isValid = makeIsValid(options);
+          thousandSepRegEx = new RegExp("\\" + options.thousandSeparator, 'g');
           ngModelCtrl.$parsers.unshift(function(viewVal) {
             var noCommasVal;
-            noCommasVal = viewVal.replace(/,/g, '');
+            noCommasVal = viewVal.toString().replace(/,/g, '');
             if (isValid(noCommasVal) || !noCommasVal) {
               ngModelCtrl.$setValidity('fcsaNumber', true);
               return noCommasVal;
@@ -132,7 +149,7 @@
               return val;
             }
             ngModelCtrl.$setValidity('fcsaNumber', true);
-            val = addCommasToInteger(val.toString());
+            val = addCommasToInteger(val.toString(), options.thousandSeparator, options.decimalSeparator);
             if (options.prepend != null) {
               val = "" + options.prepend + val;
             }
@@ -164,7 +181,7 @@
             if (options.append != null) {
               val = val.replace(options.append, '');
             }
-            elem.val(val.replace(/,/g, ''));
+            elem.val(val.replace(thousandSepRegEx, ''));
             return elem[0].select();
           });
           if (options.preventInvalidInput === true) {
@@ -181,7 +198,10 @@
 
   fcsaNumberModule.provider('fcsaNumberConfig', function() {
     var _defaultOptions;
-    _defaultOptions = {};
+    _defaultOptions = {
+      decimalSeparator: '.',
+      thousandSeparator: ','
+    };
     this.setDefaultOptions = function(defaultOptions) {
       return _defaultOptions = defaultOptions;
     };

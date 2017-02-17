@@ -11,7 +11,7 @@ fcsaNumberModule.directive 'fcsaNumber',
             for own option, value of scope.$eval(scope.options)
                 options[option] = value
         options
-    
+
     isNumber = (val) ->
         !isNaN(parseFloat(val)) && isFinite(val)
 
@@ -23,52 +23,54 @@ fcsaNumberModule.directive 'fcsaNumber',
     isNotControlKey = (which) ->
       controlKeys.indexOf(which) == -1
 
-    hasMultipleDecimals = (val) ->
-      val? && val.toString().split('.').length > 2
+    hasMultipleDecimals = (val, decimalSeparator = '.') ->
+      val? && val.toString().split(decimalSeparator).length > 2
 
-    makeMaxDecimals = (maxDecimals) ->
+    makeMaxDecimals = (maxDecimals, decimalSeparator = '.') ->
         if maxDecimals > 0
-            regexString = "^-?\\d*\\.?\\d{0,#{maxDecimals}}$"
+            regexString = "^-?\\d*\\#{decimalSeparator}?\\d{0,#{maxDecimals}}$"
         else
             regexString = "^-?\\d*$"
         validRegex = new RegExp regexString
 
         (val) -> validRegex.test val
-        
+
     makeMaxNumber = (maxNumber) ->
         (val, number) -> number <= maxNumber
 
     makeMinNumber = (minNumber) ->
         (val, number) -> number >= minNumber
 
-    makeMaxDigits = (maxDigits) ->
-        validRegex = new RegExp "^-?\\d{0,#{maxDigits}}(\\.\\d*)?$"
+    makeMaxDigits = (maxDigits, decimalSeparator = '.') ->
+        validRegex = new RegExp "^-?\\d{0,#{maxDigits}}(\\#{decimalSeparator}\\d*)?$"
         (val) -> validRegex.test val
 
     makeIsValid = (options) ->
         validations = []
-        
+
         if options.maxDecimals?
-            validations.push makeMaxDecimals options.maxDecimals
+            validations.push makeMaxDecimals options.maxDecimals, options.decimalSeparator
         if options.max?
             validations.push makeMaxNumber options.max
         if options.min?
             validations.push makeMinNumber options.min
         if options.maxDigits?
-            validations.push makeMaxDigits options.maxDigits
-            
+            validations.push makeMaxDigits options.maxDigits, options.decimalSeparator
+
         (val) ->
             return false unless isNumber val
-            return false if hasMultipleDecimals val
+            return false if hasMultipleDecimals val, options.decimalSeparator
             number = Number val
             for i in [0...validations.length]
                 return false unless validations[i] val, number
             true
-        
-    addCommasToInteger = (val) ->
-        decimals = `val.indexOf('.') == -1 ? '' : val.replace(/^-?\d+(?=\.)/, '')`
-        wholeNumbers = val.replace /(\.\d+)$/, ''
-        commas = wholeNumbers.replace /(\d)(?=(\d{3})+(?!\d))/g, '$1,'
+
+    addCommasToInteger = (val, thousandSeparator = ',', decimalSeparator = '.') ->
+        decimalRegex = new RegExp "^-?\\d+(?=\\#{decimalSeparator}.)", ""
+        decimals = `val.indexOf(decimalSeparator) == -1 ? '' : val.replace(decimalRegex, '')`
+        wholeNumbersRegEx = new RegExp "(\\#{decimalSeparator}\\d+)$"
+        wholeNumbers = val.replace wholeNumbersRegEx, ''
+        commas = wholeNumbers.replace /(\d)(?=(\d{3})+(?!\d))/g, ('$1'+thousandSeparator)
         "#{commas}#{decimals}"
 
     {
@@ -79,6 +81,8 @@ fcsaNumberModule.directive 'fcsaNumber',
         link: (scope, elem, attrs, ngModelCtrl) ->
             options = getOptions scope
             isValid = makeIsValid options
+
+            thousandSepRegEx = new RegExp "\\#{options.thousandSeparator}", 'g'
 
             ngModelCtrl.$parsers.unshift (viewVal) ->
                 noCommasVal = viewVal.toString().replace /,/g, ''
@@ -94,7 +98,7 @@ fcsaNumberModule.directive 'fcsaNumber',
                     return options.nullDisplay
                 return val if !val? || !isValid val
                 ngModelCtrl.$setValidity 'fcsaNumber', true
-                val = addCommasToInteger val.toString()
+                val = addCommasToInteger val.toString(), options.thousandSeparator, options.decimalSeparator
                 if options.prepend?
                   val = "#{options.prepend}#{val}"
                 if options.append?
@@ -115,7 +119,7 @@ fcsaNumberModule.directive 'fcsaNumber',
                   val = val.replace options.prepend, ''
                 if options.append?
                   val = val.replace options.append, ''
-                elem.val val.replace /,/g, ''
+                elem.val val.replace thousandSepRegEx, ''
                 elem[0].select()
 
             if options.preventInvalidInput == true
@@ -125,7 +129,10 @@ fcsaNumberModule.directive 'fcsaNumber',
 ]
 
 fcsaNumberModule.provider 'fcsaNumberConfig', ->
-  _defaultOptions = {}
+  _defaultOptions = {
+    decimalSeparator: '.'
+    thousandSeparator: ','
+  }
 
   @setDefaultOptions = (defaultOptions) ->
     _defaultOptions = defaultOptions
