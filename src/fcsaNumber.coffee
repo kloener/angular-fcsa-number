@@ -81,7 +81,7 @@ fcsaNumberModule.directive 'fcsaNumber',
             isValid = makeIsValid options
 
             ngModelCtrl.$parsers.unshift (viewVal) ->
-                noCommasVal = viewVal.replace /,/g, ''
+                noCommasVal = viewVal.toString().replace /,/g, ''
                 if isValid(noCommasVal) || !noCommasVal
                     ngModelCtrl.$setValidity 'fcsaNumber', true
                     return noCommasVal
