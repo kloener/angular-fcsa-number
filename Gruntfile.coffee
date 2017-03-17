@@ -10,6 +10,7 @@ module.exports = (grunt) ->
           'test/fcsaNumber.spec.js': 'test/fcsaNumber.spec.coffee'
           'test/fcsaNumberConfig.spec.js': 'test/fcsaNumberConfig.spec.coffee'
           'test/fcsaNumberConfigExt.spec.js': 'test/fcsaNumberConfigExt.spec.coffee'
+          'test/fcsaNumberExt.spec.js': 'test/fcsaNumberExt.spec.coffee'
           'e2e/fcsaNumber.e2e.js': 'e2e/fcsaNumber.e2e.coffee'
     pkg: grunt.file.readJSON('package.json')
     uglify:
@@ -47,6 +48,7 @@ module.exports = (grunt) ->
         'test/fcsaNumber.spec.coffee'
         'test/fcsaNumberConfig.spec.coffee'
         'test/fcsaNumberConfigExt.spec.coffee'
+        'test/fcsaNumberExt.spec.coffee'
         'e2e/fcsaNumber.e2e.coffee'
       ]
       tasks: 'default'
@@ -56,6 +58,7 @@ module.exports = (grunt) ->
           'test/fcsaNumber.spec.js'
           'test/fcsaNumberConfig.spec.js'
           'test/fcsaNumberConfigExt.spec.js'
+          'test/fcsaNumberExt.spec.js'
         ]
         tasks: ['karma:unit:run']
     karma:

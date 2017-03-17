@@ -20,6 +20,7 @@ module.exports = function(config) {
       'src/fcsaNumber.js',                     
       'test/fcsaNumber.spec.js',
       'test/fcsaNumberConfig.spec.js',
+      'test/fcsaNumberExt.spec.js',
       'test/fcsaNumberConfigExt.spec.js'
     ],
 
