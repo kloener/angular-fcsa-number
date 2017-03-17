@@ -31,8 +31,6 @@ fcsaNumberModule.directive 'fcsaNumber',
 
     makeMaxDecimals = (maxDecimals, decimalSeparator = '.') ->
       if maxDecimals > 0
-#        regexString = "^-?\\d*\\#{decimalSeparator}?\\d{0,#{maxDecimals}}$"
-# val contains a .
         regexString = "^-?\\d*\\.?\\d{0,#{maxDecimals}}$"
       else
         regexString = "^-?\\d*$"
@@ -47,7 +45,7 @@ fcsaNumberModule.directive 'fcsaNumber',
       (val, number) -> number >= minNumber
 
     makeMaxDigits = (maxDigits, decimalSeparator = '.') ->
-      validRegex = new RegExp "^-?\\d{0,#{maxDigits}}(\\#{decimalSeparator}\\d*)?$"
+      validRegex = new RegExp "^-?\\d{0,#{maxDigits}}(\\.\\d*)?$"
       (val) -> validRegex.test val
 
     makeIsValid = (options) ->
@@ -107,7 +105,6 @@ fcsaNumberModule.directive 'fcsaNumber',
         thousandSepRegEx = new RegExp "\\#{options.thousandSeparator}", 'g'
 
         ngModelCtrl.$parsers.unshift (viewVal) ->
-# remove thousand-separator
           noCommasVal = viewVal.toString().replace thousandSepRegEx, ''
           realNum = getRealNumber(noCommasVal, options.decimalSeparator)
           if isValid(realNum) || !realNum

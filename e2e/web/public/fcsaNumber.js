@@ -78,7 +78,7 @@
         if (decimalSeparator == null) {
           decimalSeparator = '.';
         }
-        validRegex = new RegExp("^-?\\d{0," + maxDigits + "}(\\" + decimalSeparator + "\\d*)?$");
+        validRegex = new RegExp("^-?\\d{0," + maxDigits + "}(\\.\\d*)?$");
         return function(val) {
           return validRegex.test(val);
         };
