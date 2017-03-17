@@ -127,7 +127,7 @@
           minDecimals = null;
         }
         val = val.replace(/\./g, decimalSeparator);
-        decimalRegex = new RegExp("^-?\\d+(?=\\" + decimalSeparator + ".)", "");
+        decimalRegex = new RegExp("^-?\\d+(?=\\" + decimalSeparator + ")", "");
         decimals = val.indexOf(decimalSeparator) === -1 ? '' : val.replace(decimalRegex, '');
         wholeNumbersRegEx = new RegExp("(\\" + decimalSeparator + "\\d+)$");
         wholeNumbers = val.replace(wholeNumbersRegEx, '');

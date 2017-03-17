@@ -76,7 +76,7 @@ fcsaNumberModule.directive 'fcsaNumber',
       # convert dots to options.decimalSeparator
       val = val.replace(/\./g, decimalSeparator)
 
-      decimalRegex = new RegExp "^-?\\d+(?=\\#{decimalSeparator}.)", ""
+      decimalRegex = new RegExp "^-?\\d+(?=\\#{decimalSeparator})", ""
       decimals = if val.indexOf(decimalSeparator) == -1 then '' else val.replace(decimalRegex, '')
       wholeNumbersRegEx = new RegExp "(\\#{decimalSeparator}\\d+)$"
       wholeNumbers = val.replace wholeNumbersRegEx, ''
