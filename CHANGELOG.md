@@ -1,5 +1,12 @@
 # Changelog
 
+### 1.6.0
+
+* Enhancements:
+  * `minDecimals` added right pad the decimals
+  * define custom `decimalSeparator` and `thousandSeparator` to convert numbers in another language or custom style: i.e. 13000.95 => 13_000#95
+  * updated node packages and angularjs
+
 ### 1.5.3
 
 * Bug Fixes

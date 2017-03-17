@@ -3,7 +3,7 @@
   "version": "1.6.0",
   "authors": [
     "Paul Yoder <paulyoder@gmail.com>",
-    "Christian Illies <fcsa@christianillies.de>",
+    "Christian Illies <fcsa@christianillies.de>"
   ],
   "description": "An Angular directive that validates numbers and adds commas for the thousands separator.",
   "main": "src/fcsaNumber.js",
