@@ -1,28 +1,39 @@
 (function() {
   var fcsaNumberModule,
-    __hasProp = {}.hasOwnProperty;
+    hasProp = {}.hasOwnProperty;
 
   fcsaNumberModule = angular.module('fcsa-number', []);
 
   fcsaNumberModule.directive('fcsaNumber', [
     'fcsaNumberConfig', function(fcsaNumberConfig) {
-      var addCommasToInteger, controlKeys, defaultOptions, getOptions, hasMultipleDecimals, isNotControlKey, isNotDigit, isNumber, makeIsValid, makeMaxDecimals, makeMaxDigits, makeMaxNumber, makeMinNumber;
+      var addCommasToInteger, controlKeys, defaultOptions, getOptions, getRealNumber, hasMultipleDecimals, isNotControlKey, isNotDigit, isNumber, makeIsValid, makeMaxDecimals, makeMaxDigits, makeMaxNumber, makeMinNumber;
       defaultOptions = fcsaNumberConfig.defaultOptions;
       getOptions = function(scope) {
-        var option, options, value, _ref;
+        var option, options, ref, value;
         options = angular.copy(defaultOptions);
         if (scope.options != null) {
-          _ref = scope.$eval(scope.options);
-          for (option in _ref) {
-            if (!__hasProp.call(_ref, option)) continue;
-            value = _ref[option];
+          ref = scope.$eval(scope.options);
+          for (option in ref) {
+            if (!hasProp.call(ref, option)) continue;
+            value = ref[option];
             options[option] = value;
           }
         }
         return options;
       };
-      isNumber = function(val) {
-        return !isNaN(parseFloat(val)) && isFinite(val);
+      getRealNumber = function(val, decimalSeparator) {
+        if (decimalSeparator == null) {
+          decimalSeparator = '.';
+        }
+        return val.toString().replace(new RegExp("(\\d)\\" + decimalSeparator + "(\\d)", "g"), '$1.$2');
+      };
+      isNumber = function(val, decimalSeparator) {
+        var realNum;
+        if (decimalSeparator == null) {
+          decimalSeparator = '.';
+        }
+        realNum = getRealNumber(val, decimalSeparator);
+        return !isNaN(parseFloat(realNum)) && isFinite(realNum);
       };
       isNotDigit = function(which) {
         return which < 44 || which > 57 || which === 47;
@@ -88,15 +99,15 @@
           validations.push(makeMaxDigits(options.maxDigits, options.decimalSeparator));
         }
         return function(val) {
-          var i, number, _i, _ref;
-          if (!isNumber(val)) {
+          var i, j, number, ref;
+          if (!isNumber(val, options.decimalSeparator)) {
             return false;
           }
           if (hasMultipleDecimals(val, options.decimalSeparator)) {
             return false;
           }
-          number = Number(val);
-          for (i = _i = 0, _ref = validations.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+          number = Number(getRealNumber(val, options.decimalSeparator));
+          for (i = j = 0, ref = validations.length; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
             if (!validations[i](val, number)) {
               return false;
             }
@@ -112,6 +123,7 @@
         if (decimalSeparator == null) {
           decimalSeparator = '.';
         }
+        val = val.replace(/\./g, decimalSeparator);
         decimalRegex = new RegExp("^-?\\d+(?=\\" + decimalSeparator + ".)", "");
         decimals = val.indexOf(decimalSeparator) == -1 ? '' : val.replace(decimalRegex, '');
         wholeNumbersRegEx = new RegExp("(\\" + decimalSeparator + "\\d+)$");
@@ -131,11 +143,12 @@
           isValid = makeIsValid(options);
           thousandSepRegEx = new RegExp("\\" + options.thousandSeparator, 'g');
           ngModelCtrl.$parsers.unshift(function(viewVal) {
-            var noCommasVal;
-            noCommasVal = viewVal.toString().replace(/,/g, '');
-            if (isValid(noCommasVal) || !noCommasVal) {
+            var noCommasVal, realNum;
+            noCommasVal = viewVal.toString().replace(thousandSepRegEx, '');
+            realNum = getRealNumber(noCommasVal, options.decimalSeparator);
+            if (isValid(realNum) || !realNum) {
               ngModelCtrl.$setValidity('fcsaNumber', true);
-              return noCommasVal;
+              return realNum;
             } else {
               ngModelCtrl.$setValidity('fcsaNumber', false);
               return void 0;
@@ -159,14 +172,14 @@
             return val;
           });
           elem.on('blur', function() {
-            var formatter, viewValue, _i, _len, _ref;
+            var formatter, j, len, ref, viewValue;
             viewValue = ngModelCtrl.$modelValue;
             if ((viewValue == null) || !isValid(viewValue)) {
               return;
             }
-            _ref = ngModelCtrl.$formatters;
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              formatter = _ref[_i];
+            ref = ngModelCtrl.$formatters;
+            for (j = 0, len = ref.length; j < len; j++) {
+              formatter = ref[j];
               viewValue = formatter(viewValue);
             }
             ngModelCtrl.$viewValue = viewValue;
