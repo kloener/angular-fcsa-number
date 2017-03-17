@@ -6,6 +6,8 @@ So when the user enters `1000` into a textbox and tabs out, the value will be fo
 
 If an invalid number is entered, the textbox will be invalid with the `fcsaNumber` error.
 
+[Example/Demo](https://jsfiddle.net/jsfiddle_netchristianillies/u5oafuxh/3/)
+
 ## Installation
 
 #### With Bower
