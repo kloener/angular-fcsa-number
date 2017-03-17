@@ -62,6 +62,19 @@ Validates the number does not have more than the specified number of decimals.
  * Valid: 1.23
  * Invalid: 1.234
 
+#### minDecimals
+
+Padding with zeros for decimals
+
+    fcsa-number="{ minDecimals: 2 }"
+
+ * Input: 1.23
+ * Output: 1.23
+ * Input: 1.2
+ * Output: 1.20
+ * Input: 1
+ * Output: 1.00
+
 #### maxDigits
 
 Validates the number does not have more than the specified number of digits.
