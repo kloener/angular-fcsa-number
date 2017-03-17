@@ -115,20 +115,31 @@
           return true;
         };
       };
-      addCommasToInteger = function(val, thousandSeparator, decimalSeparator) {
-        var commas, decimalRegex, decimals, wholeNumbers, wholeNumbersRegEx;
+      addCommasToInteger = function(val, thousandSeparator, decimalSeparator, minDecimals) {
+        var commas, decNum, decimalRegex, decimals, neededPadSize, pad, wholeNumbers, wholeNumbersRegEx;
         if (thousandSeparator == null) {
           thousandSeparator = ',';
         }
         if (decimalSeparator == null) {
           decimalSeparator = '.';
         }
+        if (minDecimals == null) {
+          minDecimals = null;
+        }
         val = val.replace(/\./g, decimalSeparator);
         decimalRegex = new RegExp("^-?\\d+(?=\\" + decimalSeparator + ".)", "");
-        decimals = val.indexOf(decimalSeparator) == -1 ? '' : val.replace(decimalRegex, '');
+        decimals = val.indexOf(decimalSeparator) === -1 ? '' : val.replace(decimalRegex, '');
         wholeNumbersRegEx = new RegExp("(\\" + decimalSeparator + "\\d+)$");
         wholeNumbers = val.replace(wholeNumbersRegEx, '');
         commas = wholeNumbers.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + thousandSeparator);
+        if (minDecimals !== null) {
+          decNum = decimals ? decimals.length - 1 : decimals;
+          if (decNum < minDecimals) {
+            neededPadSize = minDecimals - decNum;
+            pad = new Array(neededPadSize).join('0') + '0';
+            decimals = decimals ? decimals + pad : decimalSeparator + pad;
+          }
+        }
         return "" + commas + decimals;
       };
       return {
@@ -162,7 +173,7 @@
               return val;
             }
             ngModelCtrl.$setValidity('fcsaNumber', true);
-            val = addCommasToInteger(val.toString(), options.thousandSeparator, options.decimalSeparator);
+            val = addCommasToInteger(val.toString(), options.thousandSeparator, options.decimalSeparator, options.minDecimals);
             if (options.prepend != null) {
               val = "" + options.prepend + val;
             }

@@ -30,10 +30,9 @@ fcsaNumberModule.directive 'fcsaNumber',
       val? && val.toString().split(decimalSeparator).length > 2
 
     makeMaxDecimals = (maxDecimals, decimalSeparator = '.') ->
-      # FIXME does not work with custom decimalSeparator other than '.'
       if maxDecimals > 0
 #        regexString = "^-?\\d*\\#{decimalSeparator}?\\d{0,#{maxDecimals}}$"
-        # val contains a .
+# val contains a .
         regexString = "^-?\\d*\\.?\\d{0,#{maxDecimals}}$"
       else
         regexString = "^-?\\d*$"
@@ -71,16 +70,29 @@ fcsaNumberModule.directive 'fcsaNumber',
           return false unless validations[i] val, number
         true
 
-    addCommasToInteger = (val, thousandSeparator = ',', decimalSeparator = '.') ->
+    addCommasToInteger = (val, thousandSeparator = ',', decimalSeparator = '.', minDecimals = null) ->
+      # the val should be a number with type of a string. i.e. "123.31" or "2111.9" or "213"
 
       # convert dots to options.decimalSeparator
       val = val.replace(/\./g, decimalSeparator)
 
       decimalRegex = new RegExp "^-?\\d+(?=\\#{decimalSeparator}.)", ""
-      decimals = `val.indexOf(decimalSeparator) == -1 ? '' : val.replace(decimalRegex, '')`
+      decimals = if val.indexOf(decimalSeparator) == -1 then '' else val.replace(decimalRegex, '')
       wholeNumbersRegEx = new RegExp "(\\#{decimalSeparator}\\d+)$"
       wholeNumbers = val.replace wholeNumbersRegEx, ''
       commas = wholeNumbers.replace /(\d)(?=(\d{3})+(?!\d))/g, ('$1' + thousandSeparator)
+
+      # TODO implement minDecimals to pad with "0"
+      if minDecimals isnt null
+
+        # decimals i.e. ".1" or ".135" incl. dot, so substract 1
+        decNum = if decimals then decimals.length - 1 else decimals
+
+        if decNum < minDecimals
+          neededPadSize = minDecimals - decNum
+          pad = new Array(neededPadSize).join('0') + '0'
+          decimals = if decimals then (decimals + pad) else (decimalSeparator + pad)
+
       "#{commas}#{decimals}"
 
     {
@@ -95,7 +107,7 @@ fcsaNumberModule.directive 'fcsaNumber',
         thousandSepRegEx = new RegExp "\\#{options.thousandSeparator}", 'g'
 
         ngModelCtrl.$parsers.unshift (viewVal) ->
-          # remove thousand-separator
+# remove thousand-separator
           noCommasVal = viewVal.toString().replace thousandSepRegEx, ''
           realNum = getRealNumber(noCommasVal, options.decimalSeparator)
           if isValid(realNum) || !realNum
@@ -110,7 +122,7 @@ fcsaNumberModule.directive 'fcsaNumber',
             return options.nullDisplay
           return val if !val? || !isValid val
           ngModelCtrl.$setValidity 'fcsaNumber', true
-          val = addCommasToInteger val.toString(), options.thousandSeparator, options.decimalSeparator
+          val = addCommasToInteger val.toString(), options.thousandSeparator, options.decimalSeparator, options.minDecimals
           if options.prepend?
             val = "#{options.prepend}#{val}"
           if options.append?
