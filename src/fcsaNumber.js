@@ -54,7 +54,7 @@
           decimalSeparator = '.';
         }
         if (maxDecimals > 0) {
-          regexString = "^-?\\d*\\" + decimalSeparator + "?\\d{0," + maxDecimals + "}$";
+          regexString = "^-?\\d*\\.?\\d{0," + maxDecimals + "}$";
         } else {
           regexString = "^-?\\d*$";
         }

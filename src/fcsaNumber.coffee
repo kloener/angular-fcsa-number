@@ -32,7 +32,9 @@ fcsaNumberModule.directive 'fcsaNumber',
     makeMaxDecimals = (maxDecimals, decimalSeparator = '.') ->
       # FIXME does not work with custom decimalSeparator other than '.'
       if maxDecimals > 0
-        regexString = "^-?\\d*\\#{decimalSeparator}?\\d{0,#{maxDecimals}}$"
+#        regexString = "^-?\\d*\\#{decimalSeparator}?\\d{0,#{maxDecimals}}$"
+        # val contains a .
+        regexString = "^-?\\d*\\.?\\d{0,#{maxDecimals}}$"
       else
         regexString = "^-?\\d*$"
       validRegex = new RegExp regexString
