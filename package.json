@@ -18,8 +18,11 @@
     "grunt-file-append": "^0.0.7",
     "grunt-karma": "^2.0.0",
     "grunt-shell": "^2.1.0",
+    "jasmine-core": "^2.5.2",
     "karma": "^1.5.0",
     "karma-chrome-launcher": "^2.0.0",
+    "karma-jasmine": "^1.1.0",
+    "karma-phantomjs-launcher": "^1.0.4",
     "matchdep": "^1.0.1"
   },
   "scripts": {

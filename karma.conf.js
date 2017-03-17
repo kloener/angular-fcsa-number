@@ -19,7 +19,8 @@ module.exports = function(config) {
       'bower_components/angular-mocks/angular-mocks.js',
       'src/fcsaNumber.js',                     
       'test/fcsaNumber.spec.js',
-      'test/fcsaNumberConfig.spec.js'
+      'test/fcsaNumberConfig.spec.js',
+      'test/fcsaNumberConfigExt.spec.js'
     ],
 
 
